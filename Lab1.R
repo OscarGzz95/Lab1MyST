@@ -58,17 +58,28 @@ names(Rends) <- tk
 
 Port1 <- portfolio.spec(assets = tk)
 
-#Restricción1
+#RestricciÃ³n1
 Port1 <- add.constraint(portfolio = Port1,
                         type = "full_investment")
-#Restricción 2: Límite inferior y superior para el valor de los pesos de cada asset
+#RestricciÃ³n 2: LÃ­mite inferior y superior para el valor de los pesos de cada asset
 Port1 <- add.constraint(portfolio = Port1,
                         type = "box", min = c(0.01, 0.01, 0.01), max = c(0.7,.07,.07))
 
 Port1 <- add.objective(portfolio = Port1,type = "return", name = "mean")
 Port1 <- optimize.portfolio(R = Rends, portfolio = Port1, optimize_method = "random", trace = TRUE, 
                             search_size = 50)
+Portafolios <- vector("list", length = length(Port1$random_portfolio_objective_results))
 
+for(i in 1:length(Port1$random_portfolio_objective_results)){
+  Portafolios[[i]]$Pesos <- Port1$random_portfolio_objective_results[[i]]$weights
+  Portafolios[[i]]$Medias <- Port1$random_portfolio_objective_results[[i]]$objective_measures$mean
+  Portafolios[[i]]$Vars <- var.portfolio(R = Port1$R, weights = Portafolios[[i]]$Pesos)
+  names(Portafolios[[i]]$Medias) <- NULL
+  
+}
+
+df_Portafolios <- data.frame(matrix(nrow = length(Port1$random_portolio_objective_results), ncol = 3, data = 0))
+colnames(df_Portafolios) <- c("Rend", "Var", "Clase")
 
 
 
