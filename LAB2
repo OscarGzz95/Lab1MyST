@@ -1,6 +1,4 @@
-#LABORATORIO 2
-
-# Remover todos los objetos del "Environment"
+# Laboratorio2
 rm(list = ls())
 
 # los 0s aceptados antes de expresas una cifra en notaci?n cient?fica
@@ -230,3 +228,20 @@ plot_ly(Historico) %>%
          xaxis = list(title = "Fechas", showgrid = T),
          yaxis = list(title = "Rendimiento"), 
          legend = list(orientation = 'h', y = -0.25, x = 0.5))
+         
+#Sharpe y Sortino para R_activo y R_cuenta
+
+for (i in 1:length(Historico$Date)){
+  Rend_acum = cumsum(Historico$R_Activo[i])
+}
+
+datos_ra <- (Historico$R_Activo)
+sigm <- StdDev(R = Historico$R_Activo )
+
+SharpeRatio(datos_ra[rows=length(Historico$R_Activo), columns=Historico$Date,drop=FALSE], Rf = .0215,sigm)
+##SharpeRatio(datos_ra, Rf = .0215,sigm)
+##InformationRatio(Historico$R_Activo)
+
+
+
+
