@@ -229,19 +229,102 @@ plot_ly(Historico) %>%
          yaxis = list(title = "Rendimiento"), 
          legend = list(orientation = 'h', y = -0.25, x = 0.5))
          
+
 #Sharpe y Sortino para R_activo y R_cuenta
 
-for (i in 1:length(Historico$Date)){
-  Rend_acum = cumsum(Historico$R_Activo[i])
-}
+SharpeRatio(R=xts(x = Historico$R_Activo, order.by = as.Date(Historico$Date)),Rf =0.0215, FUN ="StdDev" )
+SortinoRatio(R =xts(x = Historico$R_Activo,order.by = as.Date(Historico$Date)),MAR =0.0215)
 
-datos_ra <- (Historico$R_Activo)
-sigm <- StdDev(R = Historico$R_Activo )
-
-SharpeRatio(datos_ra[rows=length(Historico$R_Activo), columns=Historico$Date,drop=FALSE], Rf = .0215,sigm)
-##SharpeRatio(datos_ra, Rf = .0215,sigm)
-##InformationRatio(Historico$R_Activo)
+SharpeRatio(R=xts(x = Historico$R_Cuenta,order.by = as.Date(Historico$Date)),Rf =0.0215, FUN ="StdDev" )
+SortinoRatio(R =xts(x = Historico$R_Cuenta,order.by = as.Date(Historico$Date)),MAR =0.0215)
 
 
+#Escenario1
+#Reglas
+# A) <- -0.03  # Rendimiento de -3% o menor
+# B) <- 0.20   # Comprar posicion inicial
+# C) <- 0.25   # Compra
+
+# R_Activo
+#  Sharpe (Rf=2.1%, p=95%):     0.2788
+#  Sortino Ratio (MAR = 2.15%): 0.7612
+
+# R_Cuenta
+#  Sharpe (Rf=2.1%, p=95%):     0.5427
+#  SortinoRatio (MAR = 2.15%):  2.833
+
+#Escenario2
+#Reglas
+# A) <- -0.02  # Rendimiento de -2% o menor
+# B) <- 0.30   # Comprar posicion inicial
+# C) <- 0.25   # Compra
+
+# R_Activo
+#  Sharpe (Rf=2.1%, p=95%):     0.2788
+#  Sortino Ratio (MAR = 2.15%): 0.7612
+
+# R_Cuenta
+#  Sharpe (Rf=2.1%, p=95%):     0.532    
+#  SortinoRatio (MAR = 2.15%):  2.551    
+
+
+#Escenario3
+#Reglas
+# A) <- -0.05  # Rendimiento de -5% o menor
+# B) <- 0.30   # Comprar posicion inicial
+# C) <- 0.25   # Compra
+
+# R_Activo
+#  Sharpe (Rf=2.1%, p=95%):     0.2788
+#  Sortino Ratio (MAR = 2.15%): 0.7612
+
+# R_Cuenta
+#  Sharpe (Rf=2.1%, p=95%):     0.6269   
+#  SortinoRatio (MAR = 2.15%):  4.637    
+
+
+#Escenario4
+#Reglas
+# A) <- -0.001  # Rendimiento de -0.1% o menor
+# B) <- 0.20   # Comprar posicion inicial
+# C) <- 0.20   # Compra
+
+# R_Activo
+#  Sharpe (Rf=2.1%, p=95%):     0.2788
+#  Sortino Ratio (MAR = 2.15%): 0.7612
+
+# R_Cuenta
+#  Sharpe (Rf=2.1%, p=95%):     0.5292   
+#  SortinoRatio (MAR = 2.15%):  1.988    
+
+#Escenario5
+#Reglas
+# A) <- -0.1  # Rendimiento de -10% o menor
+# B) <- 0.35   # Comprar posicion inicial
+# C) <- 0.20   # Compra
+
+# R_Activo
+#  Sharpe (Rf=2.1%, p=95%):     0.2788
+#  Sortino Ratio (MAR = 2.15%): 0.7612
+
+# R_Cuenta
+#  Sharpe (Rf=2.1%, p=95%):     0.0658   
+#  SortinoRatio (MAR = 2.15%):  0.1283  
+
+#                  Peor              Mejor
+#                   E5       E4       E3      E2        E1
+#Sharpe           0.0658   0.5292   0.6269   0.532    0.5427
+#Sortino          0.1283   1.988    4.637    2.551    2.833
+
+# El mejor escenario fue el #3 con las siguientes reglas:
+# A) <- -0.05  # Rendimiento de -5% o menor
+# B) <- 0.30   # Comprar posicion inicial
+# C) <- 0.25   # Compra
+
+# Así como el Sharpe Ratio, el Sortino Ratio siempre es mejor entre más alto.
+# El Sortino Ratio es una buena herramienta para medir el desempeño de una inversión relativo
+# a la volatilidad a la baja.
+# Como los inversionistas generalmente se preocupan solo por la volatilidad a la baja, es por 
+# esto que Sortino represetna una imagen más realista del riesgo a la baja de la acción.
 
 
