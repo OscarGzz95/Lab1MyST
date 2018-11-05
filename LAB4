@@ -79,25 +79,27 @@ e5 <- e4 + 1
 
 if(wday(e4) != 1){
   
-    Precios_Oanda <- HisPrices(AccountType = OA_At, Granularity = OA_Pr,
-                               DayAlign = OA_Da, TimeAlign = OA_Ta, Token = OA_Ak,
-                               Instrument = OA_In, 
-                               Start = e4, End = e5, Count = NULL)
-  } else {
-    Precios_Oanda <- HisPrices(AccountType = OA_At, Granularity = OA_Pr,
-                               DayAlign = OA_Da, TimeAlign = OA_Ta, Token = OA_Ak,
-                               Instrument = OA_In, 
-                               Start = e4-2, End = e5, Count = NULL)
-  }
+  Precios_Oanda <- HisPrices(AccountType = OA_At, Granularity = OA_Pr,
+                             DayAlign = OA_Da, TimeAlign = OA_Ta, Token = OA_Ak,
+                             Instrument = OA_In, 
+                             Start = e4, End = e5, Count = NULL)
+} else {
+  Precios_Oanda <- HisPrices(AccountType = OA_At, Granularity = OA_Pr,
+                             DayAlign = OA_Da, TimeAlign = OA_Ta, Token = OA_Ak,
+                             Instrument = OA_In, 
+                             Start = e4-2, End = e5, Count = NULL)
+}
 
 Precios_Oanda$TimeStamp <- as.character(as.POSIXct(Precios_Oanda$TimeStamp, format = "%m/%d/%Y %H:%M:%S"))
 
 #fecha <- as.character(as.POSIXct(Fecha_Ejemplo, format = "%m/%d/%Y %H:%M:%S"))
 
 # Para encontrar el registro donde coincide la fecha y hora del comunicado de 
-# indicador y los historicos de precios descargados
+date = Calendario$DateTime[i]
+fecha <- as.character(as.POSIXct(date, format = "%m/%d/%Y %H:%M"))
+#indicador y los historicos de precios descargados
 
-  ind <- which(Precios_Oanda$TimeStamp == Calendario$DateTime[i])
+ind <- which(Precios_Oanda$TimeStamp == Calendario$DateTime[i])
 
 # Para visualizar un data frame con los 31 precios deseados. 15 antes del comunicad, 1 
 # dIPante el comunicado y 15 después del comunicado
@@ -132,5 +134,20 @@ for(i in 1:length(IP$Date)){
   if(IP$Actual[i]<IP$Consensus[i] & IP$Consensus[i]<IP$Previous[i])
   {IP$Clasificacion[i] <-"D"}
   
-  
 }
+
+df <- Precios_Oanda[(ind-15):(ind+15),]
+window_prices[[i]]<-df
+metrics$Metric.1[[i]]<-sd(diff(log(window_prices[[i]]$Close))*MultPip_MT1)
+metrics$Metric.2[[i]]<-window_prices[[i]]$Close[[15]]-window_prices[[i]]$Close[[31]]
+metrics$Metric.3[[i]]<-(min(window_prices[[i]]$Low)-max(window_prices[[i]]$High))*MultPip_MT1
+
+
+data=data.frame(append(data,metrics))
+
+results=data.frame("case"=sort(unique(data$Class)),"resultP"=0,"resultN"=0)
+results$resultP[[4]]<-count(data$Class==4&data$Metric.2>0)[[2]][2]/count(data$Class==4)[[2]][2]
+results$resultP[[3]]<-count(data$Class==3&data$Metric.2>0)[[2]][2]/count(data$Class==3)[[2]][2]
+results$resultP[[2]]<-count(data$Class==2&data$Metric.2>0)[[2]][2]/count(data$Class==2)[[2]][2]
+results$resultP[[1]]<-count(data$Class==1&data$Metric.2>0)[[2]][2]/count(data$Class==1)[[2]][2]
+results$resultN= 1-results$resultP
